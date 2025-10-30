@@ -1,0 +1,61 @@
+services:
+  app:
+    build:
+      context: .
+      args:
+        - NODE_ENV=development
+    container_name: animal-api
+    restart: unless-stopped
+    ports:
+      - "3444:3444"  # HTTPS port
+    environment:
+      - NODE_ENV=development
+      - NODE_OPTIONS=--max-http-header-size=16384 --no-warnings=ExperimentalWarning
+      - PORT=3444
+      - JWT_SECRET=your_jwt_secret_key_here
+      - JWT_EXPIRES_IN=1h
+      - RATE_LIMIT_WINDOW_MS=900000
+      - RATE_LIMIT_MAX=100
+      - CORS_ORIGIN=http://localhost:3000,https://localhost:3444
+      - BODY_PARSER_LIMIT=10kb
+      - NODE_TLS_REJECT_UNAUTHORIZED=0  # Only for development
+      - NODE_PATH=/usr/src/app/node_modules
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+      - /usr/src/app/dist
+      - ./ssl:/usr/src/app/ssl
+      - ./logs:/usr/src/app/logs
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    working_dir: /usr/src/app
+    command: npm run dev
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:6677/health', r => {if(r.statusCode !== 200) throw new Error()})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+  # Uncomment the following if you want to add a database in the future
+  # db:
+  #   image: postgres:13
+  #   environment:
+  #     POSTGRES_USER: user
+  #     POSTGRES_PASSWORD: password
+  #     POSTGRES_DB: animaldb
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   ports:
+  #     - "5432:5432"
+
+# volumes:
+#   postgres_data:
