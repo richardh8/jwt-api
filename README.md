@@ -1,21 +1,24 @@
-# Animal API with JWT Authentication
+# JWT Authentication API
 
-A RESTful API built with Node.js, Express, and TypeScript that manages animal records with JWT authentication.
+A secure RESTful API built with Node.js, Express, and TypeScript featuring JWT authentication, rate limiting, and HTTPS support.
 
-## Features
+## ✨ Features
 
-- User authentication with JWT
-- CRUD operations for animal records
-- Input validation
-- Error handling
-- Docker support
-- TypeScript for type safety
+- 🔒 Secure JWT authentication
+- 🚀 Built with TypeScript for type safety
+- 🐳 Docker containerization
+- 🔄 Automatic HTTPS with self-signed certificates (development)
+- ⚡ Rate limiting and request validation
+- 🔄 CORS support
+- 📝 API documentation (Swagger)
+- 🧪 Unit and integration tests
 
-## Prerequisites
+## 🚀 Prerequisites
 
-- Node.js (v18 or higher)
-- npm or yarn
-- Docker (optional)
+- Node.js v18 or higher
+- npm or Yarn
+- Docker & Docker Compose (for containerization)
+- OpenSSL (for generating SSL certificates)
 
 ## Getting Started
 
@@ -34,19 +37,91 @@ npm install
 
 ### 3. Set up environment variables
 
-Create a `.env` file in the root directory with the following variables:
+Create a `.env` file in the root directory:
 
 ```env
-PORT=3443
+# Server
+PORT=3444
 NODE_ENV=development
-JWT_SECRET=your_jwt_secret_key_here
+
+# JWT
+JWT_SECRET=your_secure_jwt_secret_here
+JWT_EXPIRES_IN=1h
+
+# Rate Limiting
+RATE_LIMIT_WINDOW_MS=900000  # 15 minutes
+RATE_LIMIT_MAX=100           # Max requests per window
+
+# CORS
+CORS_ORIGIN=http://localhost:3000,https://localhost:3444
+
+# Security
+NODE_TLS_REJECT_UNAUTHORIZED=0  # Only for development
 ```
 
-### 4. Start the development server
+### 4. Generate SSL Certificates (Development)
 
 ```bash
+mkdir -p ssl
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+  -keyout ssl/localhost.key \
+  -out ssl/localhost.crt \
+  -subj "/CN=localhost"
+```
+
+### 5. Start with Docker (Recommended)
+
+```bash
+docker-compose up --build
+```
+
+Or run locally:
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
 npm run dev
 ```
+
+## 🔌 API Endpoints
+
+### Authentication
+- `POST /api/auth/register` - Register a new user
+- `POST /api/auth/login` - Login and get JWT token
+- `GET /api/auth/me` - Get current user profile (requires auth)
+
+### Animals
+- `GET /api/animals` - Get all animals (public)
+- `POST /api/animals` - Create new animal (requires auth)
+- `GET /api/animals/:id` - Get animal by ID (public)
+- `PUT /api/animals/:id` - Update animal (requires auth)
+- `DELETE /api/animals/:id` - Delete animal (requires admin)
+
+## 🔒 Authentication
+
+Include the JWT token in the `Authorization` header:
+```
+Authorization: Bearer your-jwt-token-here
+```
+
+## 🛠 Development
+
+```bash
+# Run tests
+npm test
+
+# Build for production
+npm run build
+
+# Start production server
+npm start
+```
+
+## 📝 License
+
+MIT
 
 The API will be available at `http://localhost:6677`
 
