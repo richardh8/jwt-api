@@ -75,25 +75,25 @@ export const rateLimitConfig = {
 
 // CORS configuration
 export const corsConfig = {
-  origin: (origin: string | undefined, callback: (err: Error | null, origin?: string) => void): void => {
-    // In development, allow all origins for easier testing
-    if (process.env.NODE_ENV === 'development') {
-      return callback(null, origin || '*');
-    }
-
-    // In production, only allow specified origins
-    const allowedOrigins = process.env.CORS_ORIGIN?.split(',').map(s => s.trim()) || [];
-    
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin || allowedOrigins.includes(origin)) {
-      return callback(null, origin);
-    }
-    
-    callback(new Error('Not allowed by CORS'));
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  origin: [
+    'http://localhost:3000',
+    'https://localhost:3000',
+    'http://127.0.0.1:3000',
+    'https://127.0.0.1:3000',
+    'http://localhost:3444',
+    'https://localhost:3444',
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'X-Requested-With',
+    'Accept',
+    'Origin',
+    'Access-Control-Allow-Origin',
+  ],
   credentials: true,
-  optionsSuccessStatus: 200,
-  maxAge: 600, // 10 minutes
+  optionsSuccessStatus: 204,
+  preflightContinue: false,
+  maxAge: 86400, // 24 hours
 };

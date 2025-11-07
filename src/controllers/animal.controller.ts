@@ -71,10 +71,30 @@ class AnimalController {
       throw new ApiError(404, 'Animal not found');
     }
 
-    res.status(200).json({
-      success: true,
-      message: 'Animal deleted successfully'
-    });
+    res.status(204).send();
+  }
+
+  async searchAnimals(req: Request, res: Response): Promise<void> {
+    try {
+      console.log('Search request received with query:', req.query);
+      const { q } = req.query;
+      
+      if (typeof q !== 'string' || !q.trim()) {
+        console.log('No search term provided, returning all animals');
+        const allAnimals = await animalModel.findAll();
+        res.json(allAnimals);
+        return;
+      }
+
+      console.log(`Searching for animals with term: ${q}`);
+      const results = await animalModel.search(q);
+      console.log(`Found ${results.length} results`);
+      
+      res.json(results);
+    } catch (error) {
+      console.error('Error in searchAnimals:', error);
+      throw new ApiError(500, 'Error performing search');
+    }
   }
 }
 

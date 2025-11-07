@@ -9,14 +9,11 @@ const router = Router();
 // Apply authentication middleware to all routes
 router.use(authenticate);
 
-// Get all animals
-router.get('/', async (req, res, next) => {
-  try {
-    await animalController.getAllAnimals(req, res);
-  } catch (error) {
-    next(error);
-  }
-});
+// Get all animals or search with query parameter
+router.get('/', animalController.getAllAnimals.bind(animalController));
+
+// Search animals (specific route before parameterized routes)
+router.get('/search', animalController.searchAnimals.bind(animalController));
 
 // Get animal by ID
 router.get('/:id', async (req, res, next) => {

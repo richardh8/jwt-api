@@ -1,3 +1,14 @@
+// Global error handlers
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  process.exit(1);
+});
+
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught Exception:', error);
+  process.exit(1);
+});
+
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -17,10 +28,8 @@ dotenv.config();
 
 // Initialize express app
 const app = express();
-const PORT = process.env.PORT || 6677;
-const HTTPS_PORT = process.env.HTTPS_PORT || 3443;
+const PORT = 3444; // Always use 3444 for HTTPS
 const isProduction = process.env.NODE_ENV === 'production';
-const isDevelopment = !isProduction;
 
 // Apply security middleware
 app.use(securityMiddleware);
@@ -87,32 +96,13 @@ if (process.env.NODE_ENV !== 'test') {
     honorCipherOrder: true
   };
 
-  // Create HTTPS server
+  // Create and start HTTPS server
   const httpsServer = https.createServer(sslOptions, app);
   
-  if (isProduction) {
-    // In production, set up HTTP to HTTPS redirect
-    const httpApp = express();
-    httpApp.use((req, res) => {
-      const host = req.headers.host?.replace(/:[0-9]+$/, '');
-      res.redirect(301, `https://${host}:${PORT}${req.url}`);
-    });
-    
-    const httpServer = http.createServer(httpApp);
-    httpServer.listen(80, () => {
-      console.log('HTTP server redirecting to HTTPS on port 80');
-    });
-    
-    httpsServer.listen(PORT, () => {
-      console.log(`Production HTTPS server running on port ${PORT}`);
-    });
-  } else {
-    // In development, only use HTTPS
-    httpsServer.listen(PORT, () => {
-      console.log(`Development server running in ${process.env.NODE_ENV || 'development'} mode`);
-      console.log(`HTTPS server running on https://localhost:${PORT}`);
-    });
-  }
+  httpsServer.listen(PORT, () => {
+    console.log(`Server running in ${isProduction ? 'production' : 'development'} mode`);
+    console.log(`HTTPS server running on https://localhost:${PORT}`);
+  });
 
   // Handle uncaught exceptions
   process.on('uncaughtException', (error: Error) => {

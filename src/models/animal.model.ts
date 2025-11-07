@@ -74,17 +74,50 @@ class AnimalModel {
   }
 
   async delete(id: number): Promise<boolean> {
-    console.log('Before deletion - Animals:', this.animals);
-    console.log('Deleting animal with ID:', id);
-    
     const initialLength = this.animals.length;
-    this.animals = this.animals.filter(animal => {
-      console.log(`Checking animal ID: ${animal.id}, type: ${typeof animal.id}, match: ${animal.id !== id}`);
-      return animal.id !== id;
+    this.animals = this.animals.filter(animal => animal.id !== id);
+    return this.animals.length < initialLength;
+  }
+
+  async search(query: string): Promise<Animal[]> {
+    console.log('Searching for:', query);
+    
+    if (!query) {
+      console.log('No query provided, returning all animals');
+      return this.findAll();
+    }
+
+    const searchTerm = query.toLowerCase();
+    console.log('Search term (lowercase):', searchTerm);
+    console.log('Total animals:', this.animals.length);
+    
+    const results = this.animals.filter(animal => {
+      const fieldsToSearch = [
+        animal.name,
+        animal.species,
+        animal.race,
+        animal.gender
+      ];
+      
+      const matches = fieldsToSearch.some(field => {
+        if (!field) return false;
+        const fieldLower = field.toLowerCase();
+        const hasMatch = fieldLower.includes(searchTerm);
+        if (hasMatch) {
+          console.log(`Match found in animal ${animal.id} (${animal.name}):`, {
+            field,
+            searchTerm,
+            fieldLower
+          });
+        }
+        return hasMatch;
+      });
+      
+      return matches;
     });
     
-    console.log('After deletion - Animals:', this.animals);
-    return this.animals.length < initialLength;
+    console.log(`Found ${results.length} matching animals`);
+    return results;
   }
 }
 

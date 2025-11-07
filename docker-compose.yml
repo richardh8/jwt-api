@@ -16,7 +16,7 @@ services:
       - JWT_EXPIRES_IN=1h
       - RATE_LIMIT_WINDOW_MS=900000
       - RATE_LIMIT_MAX=100
-      - CORS_ORIGIN=http://localhost:3000,https://localhost:3444
+      - CORS_ORIGIN=http://localhost:3000
       - BODY_PARSER_LIMIT=10kb
       - NODE_TLS_REJECT_UNAUTHORIZED=0  # Only for development
       - NODE_PATH=/usr/src/app/node_modules

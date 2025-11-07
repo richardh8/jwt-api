@@ -14,24 +14,27 @@
       "@/*": ["src/*"]
     },
     "typeRoots": [
-      "./node_modules/@types",
-      "./src/types"
+      "./node_modules/@types"
     ],
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true,
-    "allowSyntheticDefaultImports": true
+    "noEmit": false,
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true
+  },
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifierResolution": "node"
   },
   "include": [
     "src/**/*.ts"
   ],
   "exclude": [
     "node_modules",
-    "dist"
-  ],
-  "ts-node": {
-    "esm": true,
-    "experimentalSpecifierResolution": "node",
-    "transpileOnly": true
-  }
+    "dist",
+    "**/*.test.ts",
+    "**/*.spec.ts"
+  ]
 }
